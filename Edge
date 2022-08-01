@@ -1,0 +1,61 @@
+package graph;
+
+/**
+ * This class represents a directed edge i.e. a parent and child node, and a label for the edge
+ */
+public class Edge {
+    private String label;
+    private Node child;
+    private Node parent;
+    // AF: Edge represents a directed edge between two nodes, parent and child, and a label value.
+    // Rep Invariant: label != null, child != null, and parent != null;
+
+    /**
+     * constructs an edge from the given parent, child, and label
+     * @param parent a Node representing the parent
+     * @param child a Node representing the child
+     * @param label a string representing the label
+     */
+    public Edge(Node parent, Node child, String label) {
+        this.child = child;
+        this.label = label;
+        this.parent = parent;
+    }
+
+    /**
+     * checks if the representation invariant is violated.
+     */
+    private void checkRep() {
+        assert(parent != null);
+        assert(label != null);
+        assert(child != null);
+    }
+
+    /**
+     * returns the label of this edge
+     * @return String value of the label
+     */
+    public String getLabel (){
+        checkRep();
+        return this.label;
+    }
+
+    /**
+     * returns the chlid node of this edge
+     * @return Node value of the child
+     */
+    public Node getChild() {
+        checkRep();
+        return this.child;
+    }
+
+    /**
+     * returns the parent node of this edge
+     * @return Node value of the parent
+     */
+    public Node getParent() {
+        checkRep();
+        return this.parent;
+    }
+
+    }
