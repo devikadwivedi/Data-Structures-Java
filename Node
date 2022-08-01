@@ -1,0 +1,52 @@
+package graph;
+
+/**
+ * This class represents a node that contains a data value.
+ */
+
+public class Node {
+    private String data;
+    // AF(r) = Node r such that
+    // r has a String value data and data != null
+    // Rep Invariant is
+    // this.data != null;
+
+
+    /**
+     * creates a new Node with the given data
+     * @spec.modifies this
+     * @param data the data of the new node
+     * @spec.effects creates a new node using data
+     */
+    public Node (String data) {
+        this.data = data;
+    }
+
+    /**
+     * changes the data of this node to the given data
+     * @param newNode is the new data value
+     * @spec.requires newNode != null
+     * @spec.modifies this
+     * @spec.effects changes this node's data value to the newNode value
+     */
+    public void changeData(String newNode) {
+        checkRep();
+        this.data = newNode;
+        checkRep();
+    }
+
+    /**
+     * returns this node's data
+     * @return the String value of this node's data
+     */
+    public String getData() {
+        checkRep();
+        return this.data;
+    }
+
+    // checks if the rep invariant is violated
+    private void checkRep() {
+         assert(data != null);
+    }
+
+}
