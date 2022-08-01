@@ -1,0 +1,278 @@
+package graph;
+
+import java.util.*;
+
+
+/**
+ * This class represents a Directed Graph i.e. a collection of nodes and edges such that
+ * each edge points from one node to another.
+ */
+public class DirectedGraph {
+
+
+    private final Map <Node, Set<Edge>> graph;
+
+    // Abstraction Function: a map where each node (keys) are mapped to a set of edges that go out of the node (values)
+    // Representation Invariant:
+    // graph != null, all edges and nodes != null
+    // each node in the graph corresponds to a non-null set of edges
+    // each edge in the graph belongs in a set of edges that corresponds to a node
+
+    /**
+     * @spec.modifies this
+     * @spec.effects creates an empty directed graph
+     */
+    public DirectedGraph () {
+        this.graph = new HashMap<>();
+        checkRep();
+    }
+
+    /**
+     * inserts a node with the desired data value into the graph
+     * @param data the value of the desired new node
+     * @spec.requires data != null and data does not already exist in another node
+     * @spec.modifies this
+     * @spec.effects adds a new node to the directed graph with the given data
+     */
+    public void insertNode(String data) {
+        checkRep();
+        for (Node n : graph.keySet()) {
+            if (n.getData().equals(data)) {
+                throw new IllegalArgumentException("String data is a duplicate");
+            }
+        }
+        if (getNode(data) == null && data != null) {
+            Node addNode = new Node(data);
+            this.graph.put(addNode, new HashSet<>());
+        }
+        checkRep();
+    }
+
+    /**
+     * deletes the specified node from the graph
+     * @param data is the data of the node that will be deleted
+     * @return boolean of whether the node is successfully deleted
+     * @spec.requires data != null
+     * @spec.modifies this
+     * @spec.effects deletes the specified node from the directed graph
+     */
+    public boolean deleteNode(String data){
+        checkRep();
+        Node d = this.getNode(data);
+        if (d == null) {
+            return false;
+        }
+        this.graph.remove(d);
+        //search every edge of every node
+        for (Node n : graph.keySet()) {
+            Set<Edge> s = graph.get(n);
+            for (Edge e : s) {
+                // if the node's child is the deleted node
+                if (e.getChild().equals(data)) {
+                    this.deleteEdge(n.getData(), data, e.getLabel());
+                }
+            }
+        }
+        checkRep();
+        return true;
+    }
+
+    /**
+     * inserts an edge between two given nodes, parent and child, and assigns a label
+     * @param  start the data of the parent node
+     * @param  end the data of the child node
+     * @param label the label of desired the edge
+     * @spec.requires label != null
+     * @spec.modifies this
+     * @spec.effects if this contains the nodes start and end, and an edge does not already exist between them, a new
+     * edge is added between start and end with the given label
+     */
+    public void insertEdge(String start, String end, String label) {
+        checkRep();
+        if (start == null || end == null || label == null ) {
+            throw new IllegalArgumentException("start, end, and label must be non-null values");
+        }
+        Node startNode = getNode(start);
+        Node endNode= getNode(end);
+        Edge addEdge = new Edge(startNode, endNode, label);
+        this.graph.get(startNode).add(addEdge);
+        checkRep();
+    }
+
+    /**
+     * deletes the specified edge from the graph
+     * @param  start the data of the parent node
+     * @param  end the data of the child node
+     * @param  label the label of the edge to be deleted
+     * @spec.requires start != null, end != null, label != null
+     * @spec.modifies this
+     * @spec.effects if this contains the nodes start and end, and an edge exists between them with the label label, it
+     * will be deleted.
+     */
+    public void deleteEdge (String start, String end, String label) {
+        checkRep();
+        if (start != null && end != null) {
+            Set<Edge> edges = this.graph.get(start);
+            for (Edge e: edges) {
+                if (e.getChild().equals(end) && e.getLabel().equals(label)) {
+                    edges.remove(e);
+                    break;
+                }
+            }
+        }
+        checkRep();
+    }
+
+    /**
+     * returns the size of the graph
+     * @return an integer value of the number of nodes in this directed graph
+     * @spec.requires this != null
+     */
+    public int size() {
+        return this.graph.size();
+    }
+
+    /**
+     * changes the data of the node to the given data value
+     * @param  prevData the data of the desired node
+     * @param newData the data to replace prevData with
+     * @spec.requires prevData != null and newData != null
+     * @spec.modifies this
+     * @spec.effects changes the data of the desired node to the new data provided
+     */
+    public void changeNodeData (String prevData, String newData) {
+        checkRep();
+        for (Node n : graph.keySet()) {
+            if (n.getData().equals(newData)) {
+                throw new IllegalArgumentException("String newNode is a duplicate");
+            }
+        }
+        Node curr = this.getNode(prevData);
+        curr.changeData(newData);
+        checkRep();
+    }
+
+    /**
+     * returns a label of an edge between a parent and child node
+     * @param  start the data of the start node
+     * @param  end the data of the end node
+     * @return a string of the label of the edge between the two nodes and null if no edge exists
+     * @spec.requires start != null and end != null
+     */
+    public String getLabel(String start, String end) {
+        checkRep();
+        if (start != null && end != null) {
+            Set<Edge> edges = this.graph.get(getNode(start));
+            // iterate through all outgoing edges until the right one is found
+            for (Edge e: edges) {
+                if (e.getChild().equals(getNode(end))) {
+                    checkRep();
+                    return e.getLabel();
+                }
+            }
+        }
+        checkRep();
+        return null;
+    }
+
+    /**
+     * returns an array of all the children nodes of the given parent node
+     * @param  parent the data of the parent node
+     * @return a List of nodes representing all the child nodes of the given parent node
+     * @spec.requires parent != null
+     */
+    public List<Node> childrenOf(String parent) {
+        checkRep();
+        List<Node> children = new ArrayList<>();
+        Set<Edge> edges = this.graph.get(this.getNode(parent));
+        if (edges == null) {
+            checkRep();
+            return null;
+        }
+        // loop through all the edges and add each child to the list
+        for (Edge e: edges) {
+            Node child = e.getChild();
+            children.add(child);
+        }
+        checkRep();
+        return children;
+    }
+
+    /**
+     * returns a list of nodes of all the parents of a given child node
+     * @param child the data of the child node
+     * @return a List of nodes representing the data of all the parent nodes of the given child node
+     * @spec.requires child != null
+     */
+    public List<Node> parentsOf(String child) {
+        checkRep();
+        List<Node> arr = new ArrayList<>();
+        for (Node n : graph.keySet()) {
+            Set<Edge> s = graph.get(n);
+            for (Edge e : s) {
+                if (e.getChild().getData().equals(child)) {
+                    arr.add(n);
+                    break;
+                }
+            }
+        }
+        checkRep();
+        return arr;
+    }
+
+    /**
+     * returns the node that corresponds to a given data
+     * @param data the string data of the node to return
+     * @return the node with the data value or null if it does not exist
+     * @spec.requires data != null
+     */
+    public Node getNode(String data) {
+        checkRep();
+        if (data != null) {
+            for(Node n : graph.keySet()) {
+                checkRep();
+                if (n.getData().equals(data)) {
+                    return n;
+                }
+            }
+        }
+        checkRep();
+        return null;
+    }
+
+    /**
+     * returns a list of all nodes in the graph
+     * @return A list of nodes containing every node in the graph
+     */
+    public List<Node> getNodeList() {
+        checkRep();
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.addAll(this.graph.keySet());
+        checkRep();
+        return nodeList;
+    }
+
+    /**
+     * returns a set of outgoing edges from a given node
+     * @param node is the node we want to get edges from
+     * @return a set of edges going out from the node
+     * @spec.requires node != null
+     */
+    public Set<Edge> getEdges (Node node) {
+        checkRep();
+        return graph.get(node);
+    }
+
+    // checks that the rep invariant hasn't been violated
+    private void checkRep() {
+        assert(this.graph != null);
+        for (Node n : this.graph.keySet()) {
+            assert (n != null);
+            Set <Edge> s = this.graph.get(n);
+            assert(s != null);
+            for(Edge e : s) {
+                assert(e != null && graph.containsKey(e.getParent()));
+            }
+        }
+    }
+}
