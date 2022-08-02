@@ -1,0 +1,39 @@
+package graph.junitTests;
+
+import graph.Edge;
+import graph.Node;
+import org.junit.Test;
+
+/**
+ * Tests for the implementation of Edge class
+ */
+public class Edgejunit {
+
+    private final Node n1 = new Node("node1");
+    private final Node n2 = new Node("node2");
+
+    /** tests if edge gives the correct label */
+    @Test
+    public void testGetLabel() {
+        Edge e12 = new Edge(n1, n2, "n1 to n2");
+        assert(e12.getLabel().equals("n1 to n2"));
+        Edge e21 = new Edge(n2, n1, "n2 to n1");
+        assert(e21.getLabel().equals("n2 to n1"));
+    }
+    /** tests if edge gives the correct child */
+    @Test
+    public void testGetChild() {
+        Edge e12 = new Edge(n1, n2, "n1 to n2");
+        assert(e12.getChild() == n2);
+        Edge e21 = new Edge(n2, n1, "n2 to n1");
+        assert(e21.getChild() == n1);
+    }
+    /** tests if edge returns the correct parent */
+    @Test
+    public void testGetParent() {
+        Edge e12 = new Edge(n1, n2, "n1 to n2");
+        assert(e12.getParent() == n1);
+        Edge e21 = new Edge(n2, n1, "n2 to n1");
+        assert(e21.getParent() == n2);
+    }
+}
