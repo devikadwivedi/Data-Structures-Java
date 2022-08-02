@@ -1,0 +1,203 @@
+package graph.junitTests;
+
+import graph.DirectedGraph;
+import graph.Edge;
+import graph.Node;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Tests to for the implementation of DirectedGraph class
+ */
+public class DirectedGraphjunit {
+
+    /** Tests deletion of nodes. */
+    @Test
+    public void testdeleteNode () {
+        DirectedGraph S = new DirectedGraph();
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        boolean result = S.deleteNode("myData");
+        assert(result);
+        assert(S.size() == 1);
+
+        S.insertNode("moreData");
+        S.insertNode("evenMoreData");
+        S.insertNode("lastDataIPromise");
+        result = S.deleteNode("myData2");
+        assert(result);
+        assert(S.size() == 3);
+    }
+
+    /** Tests deletion of edges. */
+    @Test
+    public void testdeleteEdge () {
+        DirectedGraph S = new DirectedGraph();
+        //create three nodes
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        S.insertNode("myData3");
+
+        // myData has 2 children
+        S.insertEdge("myData", "myData2", "label1");
+        S.insertEdge("myData", "myData3", "label2");
+        assert(S.childrenOf("myData").size() == 2);
+        assert(S.getLabel("myData", "myData2").equals("label1"));
+        assert(S.getLabel("myData", "myData3").equals("label2"));
+
+        S.insertEdge("myData2", "myData", "label1inverse");
+        S.insertEdge("myData2", "myData3", "label2inverse");
+        assert(S.childrenOf("myData2").size() == 2);
+        assert(S.getLabel("myData2", "myData").equals("label1inverse"));
+        assert(S.getLabel("myData2", "myData3").equals("label2inverse"));
+    }
+
+    /** Tests the size of the graph */
+    @Test
+    public void testSize () {
+        DirectedGraph S = new DirectedGraph();
+
+        assert(S.size() == 0);
+
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        assert(S.size() == 2);
+
+
+        S.deleteNode("myData");
+        S.deleteNode("myData2");
+        assert(S.size() == 0);
+    }
+
+    /** Tests changing the data of nodes. */
+    @Test
+    public void testChangeData () {
+        DirectedGraph S = new DirectedGraph();
+        //create three nodes
+        S.insertNode("myData");
+        S.insertNode("myData2");
+
+        S.changeNodeData("myData", "newData");
+        S.changeNodeData("myData2", "please give me an A :)");
+
+        // if it is able to insert and edge using the new names, it has changed the name
+        S.insertEdge("newData", "please give me an A :)", "label1");
+
+        // if it is able to delete the nodes, it has changed the name
+        assert(S.deleteNode("newData"));
+        assert(S.deleteNode("please give me an A :)"));
+        assert(S.size() == 0);
+    }
+
+    /** Tests getting the edge label. */
+    @Test
+    public void testgetLabel () {
+        DirectedGraph S = new DirectedGraph();
+        //create three nodes
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        S.insertNode("myData3");
+
+        // myData has 2 children
+        S.insertEdge("myData", "myData2", "label1");
+        S.insertEdge("myData", "myData3", "label2");
+        assert(S.getLabel("myData", "myData2").equals("label1"));
+        assert(S.getLabel("myData", "myData3").equals("label2"));
+
+        // myData2 has 2 children
+        S.insertEdge("myData2", "myData", "label1inverse");
+        S.insertEdge("myData2", "myData3", "label2inverse");
+        assert(S.getLabel("myData2", "myData").equals("label1inverse"));
+        assert(S.getLabel("myData2", "myData3").equals("label2inverse"));
+    }
+
+    /** Tests the parents of the nodes. */
+    @Test
+    public void testParentsOf() {
+        DirectedGraph S = new DirectedGraph();
+        //create three nodes
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        S.insertNode("myData3");
+
+        List<Node> parents = new ArrayList<>();
+
+        // myData has 2 children
+        S.insertEdge("myData", "myData2", "label1");
+        S.insertEdge("myData3", "myData2", "label2");
+
+        parents = S.parentsOf("myData2");
+        assert(parents.size() == 2);
+        assert(parents.get(0).getData().equals("myData") || parents.get(1).getData().equals("myData"));
+        assert(parents.get(0).getData().equals("myData3") || parents.get(1).getData().equals("myData3"));
+
+
+        // myData2 has 2 children
+        S.insertEdge("myData2", "myData", "label1inverse");
+        S.insertEdge("myData3", "myData", "label2inverse");
+        parents = S.parentsOf("myData");
+        assert(parents.size() == 2);
+        assert(parents.get(0).getData().equals("myData2") || parents.get(1).getData().equals("myData2"));
+        assert(parents.get(0).getData().equals("myData3") || parents.get(1).getData().equals("myData3"));
+    }
+
+    /** Tests deletion of nodes. */
+    @Test
+    public void testgetNode () {
+        DirectedGraph S = new DirectedGraph();
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        Node n1 = S.getNode("myData");
+        assert(n1.getData().equals("myData"));
+
+        n1.changeData("myDatachanged");
+        n1 = S.getNode("myDatachanged");
+        assert(n1.getData().equals("myDatachanged"));
+
+        Node n2 = S.getNode("myData");
+        assert(n2 == null);
+    }
+
+    /** Tests all the nodes in the graph */
+    @Test
+    public void testGetNodeList() {
+        DirectedGraph S = new DirectedGraph();
+        S.insertNode("myData1");
+        S.insertNode("myData2");
+        S.insertNode("myData3");
+        S.insertNode("myData4");
+        List<Node> nodes = S.getNodeList();
+
+        List<String> expected = new ArrayList<>(List.of("myData1", "myData2", "myData3", "myData4"));
+        for (String s : expected) {
+            assert nodes.contains(S.getNode(s));
+        }
+        assert(true);
+
+    }
+
+    /** Tests the set of edges outgoing from a node */
+    @Test
+    public void testGetEdges() {
+        DirectedGraph S = new DirectedGraph();
+        //create three nodes
+        S.insertNode("myData");
+        S.insertNode("myData2");
+        S.insertNode("myData3");
+
+        // myData has 2 children
+        S.insertEdge("myData", "myData2", "label1");
+        S.insertEdge("myData", "myData3", "label2");
+        Set<Edge> edges = S.getEdges(S.getNode("myData"));
+
+        for (Edge e : edges) {
+            assert(e.getParent().getData().equals("myData"));
+            assert(e.getChild().getData().equals("myData2") || e.getChild().getData().equals("myData3"));
+
+        }
+    }
+
+}
