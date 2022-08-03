@@ -7,7 +7,7 @@ import java.util.*;
  * This class represents a Directed Graph i.e. a collection of nodes and edges such that
  * each edge points from one node to another.
  */
-public class DirectedGraph {
+public class Graph {
 
 
     private final Map <Node, Set<Edge>> graph;
